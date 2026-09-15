@@ -1,0 +1,38 @@
+name: RideLink Microservices CI
+
+# මේ pipeline එක වැඩ කරන්නේ main සහ develop branches වලට push හෝ PR එකක් ආවමයි
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    
+    # Services 4 වෙන වෙනම parallel run කරන්න matrix එකක් පාවිච්චි කරනවා
+    strategy:
+      fail-fast: false # එක service එකක් fail වුණත් අනිත් ඒවා දිගටම run වෙන්න දෙනවා
+      matrix:
+        service: 
+          - account-service
+          - driver-service
+          - ride-service
+          - fare-service
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and Test ${{ matrix.service }}
+        working-directory: ./${{ matrix.service }}
+        run: mvn clean test
