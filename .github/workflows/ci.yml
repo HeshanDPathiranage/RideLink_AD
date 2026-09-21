@@ -11,12 +11,12 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
-    
+
     # Services 4 වෙන වෙනම parallel run කරන්න matrix එකක් පාවිච්චි කරනවා
     strategy:
       fail-fast: false # එක service එකක් fail වුණත් අනිත් ඒවා දිගටම run වෙන්න දෙනවා
       matrix:
-        service: 
+        service:
           - account-service
           - driver-service
           - ride-service
@@ -26,13 +26,15 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
       - name: Build and Test ${{ matrix.service }}
         working-directory: ./${{ matrix.service }}
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: mvn clean test
