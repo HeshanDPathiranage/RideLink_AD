@@ -11,10 +11,6 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
 
-<<<<<<< HEAD
-=======
-    # Services 4 වෙන වෙනම parallel run කරන්න matrix එකක් පාවිච්චි කරනවා
->>>>>>> main
     strategy:
       fail-fast: false
       matrix:
@@ -51,6 +47,4 @@ jobs:
 
       - name: Build and Test ${{ matrix.service }}
         working-directory: ./${{ matrix.service }}
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: mvn clean test
