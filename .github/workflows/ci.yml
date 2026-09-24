@@ -1,6 +1,5 @@
 name: RideLink Microservices CI
 
-# මේ pipeline එක වැඩ කරන්නේ main සහ develop branches වලට push හෝ PR එකක් ආවමයි
 on:
   push:
     branches: [ "main", "develop" ]
@@ -12,15 +11,29 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
 
-    # Services 4 වෙන වෙනම parallel run කරන්න matrix එකක් පාවිච්චි කරනවා
     strategy:
-      fail-fast: false # එක service එකක් fail වුණත් අනිත් ඒවා දිගටම run වෙන්න දෙනවා
+      fail-fast: false
       matrix:
         service:
           - account-service
           - driver-service
           - ride-service
           - fare-service
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MONGODB_URI: mongodb://127.0.0.1:27017/ridelink_test
+      MONGO_URI: mongodb://127.0.0.1:27017/ridelink_test
 
     steps:
       - name: Checkout Source Code
@@ -30,11 +43,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
+          distribution: temurin
+          cache: maven
 
       - name: Build and Test ${{ matrix.service }}
         working-directory: ./${{ matrix.service }}
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: mvn clean test
