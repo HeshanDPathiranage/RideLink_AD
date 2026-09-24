@@ -32,7 +32,8 @@ jobs:
           --health-retries 5
 
     env:
-      MONGODB_URI: mongodb://127.0.0.1:27017/ride_service_test
+      MONGODB_URI: mongodb://127.0.0.1:27017/ridelink_test
+      MONGO_URI: mongodb://127.0.0.1:27017/ridelink_test
 
     steps:
       - name: Checkout Source Code
